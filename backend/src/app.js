@@ -4,17 +4,17 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 
+const authRoutes = require("./routes/authRoutes");
+
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
-
-const authRoutes = require("./routes/authRoutes");
 
 // global middlewares
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// check route
+// routes
 app.get("/", (req,res) => {
     res.status(200).json({
         success: true,
@@ -24,6 +24,7 @@ app.get("/", (req,res) => {
 
 app.use("/api/auth", authRoutes);
 
+// error handling
 app.use(notFound);
 app.use(errorHandler);
 

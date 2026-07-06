@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const generateToken = require("../utils/generateToken");
 
 const loginUser = async (req, res, next) => {
     try {
@@ -39,7 +40,19 @@ const loginUser = async (req, res, next) => {
         }
 
         // 4. Remove password before sending response
+        const token = generateToken(user._id, user.role);
         user.password = undefined;
+        res
+            .cookie("token", token, {
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000,
+            })
+            .status(200)
+            .json({
+                success: true,
+                message: "Login successful",
+                user,
+            });
 
         // 5. Send response
         res.status(200).json({
@@ -53,6 +66,14 @@ const loginUser = async (req, res, next) => {
     }
 };
 
+const getProfile = async (req, res) => {
+    res.status(200).json({
+        success: true,
+        user: req.user,
+    });
+};
+
 module.exports = {
     loginUser,
+    getProfile,
 };
