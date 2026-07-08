@@ -4,14 +4,14 @@ const electionSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Election title is required"],
+      required: true,
       trim: true,
     },
 
     description: {
       type: String,
-      trim: true,
       default: "",
+      trim: true,
     },
 
     status: {

@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 const authRoutes = require("./routes/authRoutes");
+const electionRoutes = require("./routes/electionRoutes");
 
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
@@ -23,6 +24,7 @@ app.get("/", (req,res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/elections", electionRoutes);
 
 // error handling
 app.use(notFound);
