@@ -55,14 +55,75 @@ const seedUsers = async () => {
                 year: 3,
                 role: "Student",
             },
+            {
+                name: "Rohit Verma",
+                rollNumber: "23MECH010",
+                email: "rohit@college.edu",
+                password: studentPassword1,
+                department: "Mechanical",
+                year: 2,
+                role: "Student",
+            },
+            {
+                name: "Sneha Gupta",
+                rollNumber: "23CIV005",
+                email: "sneha@college.edu",
+                password: studentPassword2,
+                department: "Civil",
+                year: 4,
+                role: "Student",
+            },
+            {
+                name: "Karan Gill",
+                rollNumber: "23IT007",
+                email: "karan@college.edu",
+                password: studentPassword3,
+                department: "Information Technology",
+                year: 2,
+                role: "Student",
+            },
+            {
+                name: "Simranjeet Kaur",
+                rollNumber: "23BIO011",
+                email: "simran@college.edu",
+                password: studentPassword1,
+                department: "Biotechnology",
+                year: 3,
+                role: "Student",
+            },
+            {
+                name: "Arjun Mehta",
+                rollNumber: "23MATH009",
+                email: "arjun@college.edu",
+                password: studentPassword2,
+                department: "Mathematics",
+                year: 1,
+                role: "Student",
+            },
+            {
+                name: "Neha Rani",
+                rollNumber: "23PHY008",
+                email: "neha@college.edu",
+                password: studentPassword3,
+                department: "Physics",
+                year: 2,
+                role: "Student",
+            },
+            {
+                name: "Vikas Kumar",
+                rollNumber: "23CHE012",
+                email: "vikas@college.edu",
+                password: studentPassword1,
+                department: "Chemistry",
+                year: 4,
+                role: "Student",
+            },
         ]);
 
         console.log("Users seeded successfully!");
-
         process.exit();
     } catch (error) {
         console.error(error);
-
         process.exit(1);
     }
 };

@@ -1,4 +1,5 @@
 const Election = require("../models/Election");
+const Candidate = require("../models/Candidate");
 
 const createElection = async (req, res, next) => {
     try {
@@ -93,6 +94,17 @@ const updateElectionStatus = async (req, res, next) => {
 
         // Business Rule
         if (status === "Active") {
+            const candidateCount = await Candidate.countDocuments({
+                election: id,
+            });
+
+            if (candidateCount < 2) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "At least two candidates are required to activate an election.",
+                });
+            }
             const activeElection = await Election.findOne({
                 status: "Active",
             });
@@ -107,7 +119,7 @@ const updateElectionStatus = async (req, res, next) => {
             }
         }
 
-        const election = await Election.findByIdAndUpdate(id,{status,},{new: true,});
+        const election = await Election.findByIdAndUpdate(id, { status, }, { new: true, });
 
         if (!election) {
             return res.status(404).json({

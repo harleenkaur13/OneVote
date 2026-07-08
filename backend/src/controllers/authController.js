@@ -42,7 +42,8 @@ const loginUser = async (req, res, next) => {
         // 4. Remove password before sending response
         const token = generateToken(user._id, user.role);
         user.password = undefined;
-        res
+
+        return res
             .cookie("token", token, {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000,
@@ -53,13 +54,6 @@ const loginUser = async (req, res, next) => {
                 message: "Login successful",
                 user,
             });
-
-        // 5. Send response
-        res.status(200).json({
-            success: true,
-            message: "Login successful",
-            user,
-        });
 
     } catch (error) {
         next(error);
