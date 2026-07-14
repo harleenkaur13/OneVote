@@ -119,7 +119,11 @@ const updateElectionStatus = async (req, res, next) => {
             }
         }
 
-        const election = await Election.findByIdAndUpdate(id, { status, }, { new: true, });
+        const election = await Election.findByIdAndUpdate(
+            id,
+            { status },
+            { returnDocument: "after" }
+        );
 
         if (!election) {
             return res.status(404).json({

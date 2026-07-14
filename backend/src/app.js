@@ -6,7 +6,6 @@ const app = express();
 
 const authRoutes = require("./routes/authRoutes");
 const electionRoutes = require("./routes/electionRoutes");
-// const candidateRoutes = require("./routes/candidateRoutes");
 
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
@@ -26,7 +25,6 @@ app.get("/", (req,res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/elections", electionRoutes);
-// app.use("/api/candidates", candidateRoutes);
 
 // error handling
 app.use(notFound);
