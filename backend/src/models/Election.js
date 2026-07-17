@@ -14,6 +14,18 @@ const electionSchema = new mongoose.Schema(
       trim: true,
     },
 
+    scope: {
+      department: {
+        type: String,
+        default: null, // null means no restriction (all departments / all years)
+      },
+
+      year: {
+        type: Number,
+        default: null,
+      },
+    },
+
     status: {
       type: String,
       enum: ["Upcoming", "Active", "Closed"],

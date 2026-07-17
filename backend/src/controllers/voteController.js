@@ -28,15 +28,8 @@ const castVote = async (req, res, next) => {
         // 3. Check candidate belongs to this election
         // Accept either the candidate document `_id` or the candidate `user` id
         const candidate = await Candidate.findOne({
-            $and: [
-                { election: electionID },
-                {
-                    $or: [
-                        { _id: candidateID },
-                        { user: candidateID },
-                    ],
-                },
-            ],
+            _id: candidateID,
+            election: electionID,
         });
 
         if (!candidate) {
@@ -46,6 +39,27 @@ const castVote = async (req, res, next) => {
             });
         }
 
+        // Check if student is eligible for this election
+        if (
+            election.scope?.department &&
+            req.user.department !== election.scope.department
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not eligible to vote in this election.",
+            });
+        }
+
+        if (
+            election.scope?.year !== null &&
+            election.scope?.year !== undefined &&
+            req.user.year !== election.scope.year
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not eligible to vote in this election.",
+            });
+        }
         // 4. Check if student already voted
         const existingVote = await Vote.findOne({
             student: req.user._id,
@@ -62,13 +76,19 @@ const castVote = async (req, res, next) => {
         // 5. Record the vote
         await Vote.create({
             student: req.user._id,
-            candidate: candidateID,
+            candidate: candidate._id,
             election: electionID,
         });
 
         // 6. Increment vote count (use the loaded candidate document)
-        candidate.voteCount += 1;
-        await candidate.save();
+        await Candidate.findByIdAndUpdate(
+            candidate._id,
+            {
+                $inc: {
+                    voteCount: 1,
+                },
+            }
+        );
 
         res.status(201).json({
             success: true,
@@ -105,13 +125,13 @@ const getElectionResults = async (req, res, next) => {
         const results = await Candidate.find({
             election: electionID,
         })
-        .populate(
-            "user",
-            "name rollNumber department year"
-        )
-        .sort({
-            voteCount: -1,
-        });
+            .populate(
+                "user",
+                "name rollNumber department year"
+            )
+            .sort({
+                voteCount: -1,
+            });
 
         res.status(200).json({
             success: true,

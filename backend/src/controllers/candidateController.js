@@ -25,13 +25,24 @@ const getEligibleStudents = async (req, res, next) => {
         // Extract candidate user IDs
         const candidateIDs = candidates.map(candidate => candidate.user);
 
-        // Fetch students who are not already candidates
-        const students = await User.find({
+        // Build query dynamically based on election scope
+        const studentQuery = {
             role: "Student",
             _id: { $nin: candidateIDs },
-        })
-        .select("name rollNumber department year")
-        .sort({ rollNumber: 1 });
+        };
+
+        if (election.scope?.department) {
+            studentQuery.department = election.scope.department;
+        }
+
+        if (election.scope?.year !== null && election.scope?.year !== undefined) {
+            studentQuery.year = election.scope.year;
+        }
+
+        // Fetch eligible students
+        const students = await User.find(studentQuery)
+            .select("name rollNumber department year")
+            .sort({ rollNumber: 1 });
 
         res.status(200).json({
             success: true,
@@ -81,6 +92,28 @@ const addCandidate = async (req, res, next) => {
             return res.status(404).json({
                 success: false,
                 message: "Student not found.",
+            });
+        }
+
+        // Check if student belongs to election scope
+        if (
+            election.scope?.department &&
+            student.department !== election.scope.department
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Student does not belong to the eligible department.",
+            });
+        }
+
+        if (
+            election.scope?.year !== null &&
+            election.scope?.year !== undefined &&
+            student.year !== election.scope.year
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Student does not belong to the eligible year.",
             });
         }
 

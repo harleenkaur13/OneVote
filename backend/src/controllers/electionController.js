@@ -1,9 +1,11 @@
 const Election = require("../models/Election");
 const Candidate = require("../models/Candidate");
+const User = require("../models/User");
+const Vote = require("../models/Vote");
 
 const createElection = async (req, res, next) => {
     try {
-        const { title, description, startDate, endDate } = req.body;
+        const { title, description, scope = {}, startDate, endDate } = req.body;
 
         // Validate input
         if (!title || !startDate || !endDate) {
@@ -24,6 +26,10 @@ const createElection = async (req, res, next) => {
         const election = await Election.create({
             title,
             description,
+            scope: {
+                department: scope.department ?? null,
+                year: scope.year ?? null,
+            },
             startDate,
             endDate,
         });
@@ -143,9 +149,77 @@ const updateElectionStatus = async (req, res, next) => {
     }
 };
 
+const getElectionStatistics = async (req, res, next) => {
+    try {
+        const { electionID } = req.params;
+
+        // Check election
+        const election = await Election.findById(electionID);
+
+        if (!election) {
+            return res.status(404).json({
+                success: false,
+                message: "Election not found.",
+            });
+        }
+
+        // Build query for eligible students
+        const studentQuery = {
+            role: "Student",
+        };
+
+        if (election.scope?.department) {
+            studentQuery.department = election.scope.department;
+        }
+
+        if (
+            election.scope?.year !== null &&
+            election.scope?.year !== undefined
+        ) {
+            studentQuery.year = election.scope.year;
+        }
+
+        // Counts
+        const eligibleStudents = await User.countDocuments(studentQuery);
+
+        const candidateCount = await Candidate.countDocuments({
+            election: electionID,
+        });
+
+        const votesCast = await Vote.countDocuments({
+            election: electionID,
+        });
+
+        const turnout =
+            eligibleStudents === 0
+                ? 0
+                : Number(
+                      (
+                          (votesCast / eligibleStudents) *
+                          100
+                      ).toFixed(2)
+                  );
+
+        res.status(200).json({
+            success: true,
+            statistics: {
+                status: election.status,
+                eligibleStudents,
+                candidateCount,
+                votesCast,
+                turnout,
+            },
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createElection,
     getAllElections,
     getActiveElection,
     updateElectionStatus,
+    getElectionStatistics,
 };

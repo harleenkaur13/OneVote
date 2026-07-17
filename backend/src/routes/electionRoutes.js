@@ -4,7 +4,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
 const studentMiddleware = require("../middleware/studentMiddleware");
 
-const {createElection, getAllElections, getActiveElection, updateElectionStatus} = require("../controllers/electionController");
+const {createElection, getAllElections, getActiveElection, updateElectionStatus, getElectionStatistics} = require("../controllers/electionController");
 const {getEligibleStudents,addCandidate,getCandidatesByElection,deleteCandidate} = require("../controllers/candidateController")
 const { castVote, getElectionResults } = require("../controllers/voteController");
 const router = express.Router();
@@ -12,7 +12,9 @@ const router = express.Router();
 router.post("/",authMiddleware,adminMiddleware,createElection);
 router.get("/",authMiddleware,adminMiddleware,getAllElections);
 router.get("/active",authMiddleware,getActiveElection);
-router.patch("/:id/status",authMiddleware,adminMiddleware,updateElectionStatus);
+router.patch("/:id/status",authMiddleware,adminMiddleware,updateElectionStatus,getElectionStatistics);
+router.get("/:electionID/statistics",authMiddleware,adminMiddleware,getElectionStatistics
+);
 
 // candidate management
 router.get("/:electionID/eligible-students",authMiddleware,adminMiddleware,getEligibleStudents);
